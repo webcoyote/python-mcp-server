@@ -52,6 +52,7 @@ func main() {
 		}
 	} else {
 		// Run as stdio server
+		log.Printf("Starting as stdio server")
 		if err := server.ServeStdio(mcpServer); err != nil {
 			log.Fatalf("Failed to start stdio server: %v", err)
 		}
