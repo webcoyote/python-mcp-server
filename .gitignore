@@ -1,0 +1,4 @@
+/.git/
+/logs/
+.env
+.env.local.*
