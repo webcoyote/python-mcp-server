@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Build the project
+set -euo pipefail
+trap 'echo "$0: line $LINENO: $BASH_COMMAND: exitcode $?"' ERR
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[@]}")" && pwd)"
+cd "$SCRIPT_DIR/.."
+START_TIME=$(date +%s.%N)
+
+echo "🔨 Building app..."
+go mod tidy && go install
+
+END_TIME=$(date +%s.%N)
+ELAPSED_TIME=$(echo "$END_TIME - $START_TIME" | bc --mathlib | xargs printf "%.2f\n")
+echo "✅ Build completed in $ELAPSED_TIME seconds!"

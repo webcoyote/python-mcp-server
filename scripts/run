@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# Run the project without building it
+set -euo pipefail
+trap 'echo "$0: line $LINENO: $BASH_COMMAND: exitcode $?"' ERR
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[@]}")" && pwd)"
+START_TIME=$(date +%s.%N)
+
+echo "🚀 Launching app..."
+uv run "$SCRIPT_DIR/test_mcp.py" --pretty
+
+END_TIME=$(date +%s.%N)
+ELAPSED_TIME=$(echo "$END_TIME - $START_TIME" | bc --mathlib | xargs printf "%.2f\n")
+echo "✅ Running in $ELAPSED_TIME seconds!"

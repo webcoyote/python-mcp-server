@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+set -euo pipefail
+trap 'echo "$0: line $LINENO: $BASH_COMMAND: exitcode $?"' ERR
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[@]}")" && pwd)"
+cd "$SCRIPT_DIR/.."
+START_TIME=$(date +%s.%N)
+
+# Install tools
+command -v direnv &>/dev/null || brew install direnv
+command -v podman &>/dev/null || brew install podman
+
+# Configure tools
+"$SCRIPT_DIR/install-git-hooks"
+
+# Make a logs directory that won't get deleted by git clean
+mkdir -p "logs"
+[[ -d "logs/.git" ]] || git init "logs" 1>/dev/null
+
+# Ensure podman machine exists and is running
+if ! podman machine list --format "{{.Name}}" 2>/dev/null | grep -q "podman-machine-default"; then
+    podman machine init
+fi
+if ! podman machine list --format "{{.Name}} {{.Running}}" 2>/dev/null | grep -q "podman-machine-default.*true"; then
+    podman machine start --quiet
+fi
+
+END_TIME=$(date +%s.%N)
+ELAPSED_TIME=$(echo "$END_TIME - $START_TIME" | bc --mathlib | xargs printf "%.2f\n")
+echo "✅ Setup complete in $ELAPSED_TIME seconds."
